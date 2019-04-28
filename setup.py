@@ -5,14 +5,8 @@ import subprocess
 import sys
 import os
 
-try:
-    from Cython.Distutils import build_ext
-except ImportError:
-    raise Exception("*** cython is needed to build this extension.")
-
 cmdclass = {}
 ext_modules = []
-
 
 def getstatusoutput(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -133,9 +127,14 @@ ext_modules += [
                                   '-DHAVE_ATLAS', '-g'],
               **find_dependencies()),
 ]
-cmdclass.update({'build_ext': build_ext})
-for e in ext_modules:
-    e.cython_directives = {'language_level': "3"}
+try:
+    from Cython.Distutils import build_ext
+    cmdclass.update({ 'build_ext': build_ext })
+    for e in ext_modules:
+        e.cython_directives = {'language_level': "3"}
+except ImportError:
+	pass # *** cython is needed to build this extension.
+
 setup(
     name='py-kaldi-asr',
     version='0.5.2',
