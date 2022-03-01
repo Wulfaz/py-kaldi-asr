@@ -43,6 +43,12 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
     steps:
     - uses: actions/checkout@v2
+    - name: Determine version from setup.py
+      shell: bash
+      id: version
+      run: |
+        VERSION=`grep version setup.py | tr "'" " " | awk '{ print $2 }'`
+        echo ::set-output name=VERSION::${VERSION}
     - name: Download and extract kaldi
       shell: bash
       env:
@@ -77,13 +83,13 @@ jobs:
     - name: Upload Wheel
       uses: actions/upload-artifact@v2
       with:
-        name: py_kaldi_asr-0.5.3-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
-        path: dist/py_kaldi_asr-0.5.3-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
+        name: py_kaldi_asr-${{ steps.version.outputs.VERSION }}-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
+        path: dist/py_kaldi_asr-${{ steps.version.outputs.VERSION }}-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
     - name: Upload Egg
       uses: actions/upload-artifact@v2
       with:
-        name: py_kaldi_asr-0.5.3-${{ matrix.python_version_egg }}-linux-${{ matrix.arch }}.egg
-        path: dist/py_kaldi_asr-0.5.3-${{ matrix.python_version_egg }}-linux-${{ matrix.arch }}.egg
+        name: py_kaldi_asr-${{ steps.version.outputs.VERSION }}-${{ matrix.python_version_egg }}-linux-${{ matrix.arch }}.egg
+        path: dist/py_kaldi_asr-${{ steps.version.outputs.VERSION }}-${{ matrix.python_version_egg }}-linux-${{ matrix.arch }}.egg
 
   test_wheel:
     name: "Test wheel"
@@ -127,6 +133,12 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
     steps:
     - uses: actions/checkout@v2
+    - name: Determine version from setup.py
+      shell: bash
+      id: version
+      run: |
+        VERSION=`grep version setup.py | tr "'" " " | awk '{ print $2 }'`
+        echo ::set-output name=VERSION::${VERSION}
     - name: Download and extract kaldi
       shell: bash
       env:
@@ -143,7 +155,7 @@ jobs:
     - name: Download wheel
       uses: actions/download-artifact@v2
       with:
-        name: py_kaldi_asr-0.5.3-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
+        name: py_kaldi_asr-${{ steps.version.outputs.VERSION }}-${{ matrix.python_version_wheel }}-linux_${{ matrix.arch }}.whl
     - name: Download model
       shell: bash
       run: |
