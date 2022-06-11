@@ -37,8 +37,6 @@ jobs:
         . /etc/os-release && echo "$ID$VERSION_ID-`uname -m`" > release_name
     - name: Download and extract kaldi
       shell: bash
-      env:
-        MACHINE: ${{ matrix.arch }}
       run: |
         release_name=`cat release_name`
         os_name=`uname | tr A-Z a-z`
@@ -115,8 +113,6 @@ jobs:
         . /etc/os-release && echo "$ID$VERSION_ID-`uname -m`" > release_name
     - name: Download and extract kaldi
       shell: bash
-      env:
-        MACHINE: ${{ matrix.arch }}
       run: |
         release_name=`cat release_name`
         os_name=`uname | tr A-Z a-z`
