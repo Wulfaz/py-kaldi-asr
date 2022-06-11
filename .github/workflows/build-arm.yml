@@ -1,15 +1,23 @@
 name: Build py-kaldi-asr on armv6l, armv7l and aarch64
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+    tags:
+  pull_request:
+  workflow_dispatch:
 jobs:
   build_wheel_egg:
     name: "Build wheel & egg"
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        target: [armv6l_raspbian, armv6l_raspios, armv7l_raspios, aarch64_raspios]
+        target: [armv6l_raspbian, armv6l_raspios, armv7l_raspbian, armv7l_raspios, aarch64_raspios]
         include:
         - target: armv6l_raspbian
           arch: armv6l
+          kaldi_arch: armv6l
           cpu: arm1176
           python_version_wheel: cp37-cp37m
           python_version_egg: py3.7
@@ -18,14 +26,25 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_zero_w
         - target: armv6l_raspios
           arch: armv6l
+          kaldi_arch: armv6l
           cpu: arm1176
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
           base_image: raspios_lite:latest
           raspbian_name: raspbian11
           cpu_info: cpuinfo/raspberrypi_zero_w
+        - target: armv7l_raspbian
+          arch: armv7l
+          kaldi_arch: armv6l
+          cpu: cortex-a7
+          python_version_wheel: cp37-cp37m
+          python_version_egg: py3.7
+          base_image: raspbian_lite:latest
+          raspbian_name: raspbian10
+          cpu_info: cpuinfo/raspberrypi_3b
         - target: armv7l_raspios
           arch: armv7l
+          kaldi_arch: armv7l
           cpu: cortex-a7
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
@@ -34,6 +53,7 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_3b
         - target: aarch64_raspios
           arch: aarch64
+          kaldi_arch: aarch64
           cpu: cortex-a53
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
@@ -51,7 +71,7 @@ jobs:
     - name: Download and extract kaldi
       shell: bash
       env:
-        MACHINE: ${{ matrix.arch }}
+        MACHINE: ${{ matrix.kaldi_arch }}
         RASPBIAN_NAME: ${{ matrix.raspbian_name }}
       run: |
         KALDI_RELEASE=e4940d045
@@ -73,6 +93,8 @@ jobs:
         copy_repository_path:
             /home/pi/py-kaldi-asr
         commands: |
+            # Disable IPv6 in case it is configured but does not work
+            ping6 -c 1 www.ietf.org || sudo sysctl -w net.ipv6.conf.eth0.disable_ipv6=1
             apt-get update -y --allow-releaseinfo-change
             apt-get install --no-install-recommends -y python3 python3-setuptools python3-pip python3-dev python3-numpy cython3 python3-wheel libatlas-base-dev
             cp -a kaldi/opt /
@@ -95,11 +117,13 @@ jobs:
     needs: [build_wheel_egg]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        target: [armv6l_raspbian, armv6l_raspios, armv7l_raspios, aarch64_raspios]
+        target: [armv6l_raspbian, armv6l_raspios, armv7l_raspbian, armv7l_raspios, aarch64_raspios]
         include:
         - target: armv6l_raspbian
           arch: armv6l
+          kaldi_arch: armv6l
           cpu: arm1176
           python_version_wheel: cp37-cp37m
           python_version_egg: py3.7
@@ -108,14 +132,25 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_zero_w
         - target: armv6l_raspios
           arch: armv6l
+          kaldi_arch: armv6l
           cpu: arm1176
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
           base_image: raspios_lite:latest
           raspbian_name: raspbian11
           cpu_info: cpuinfo/raspberrypi_zero_w
+        - target: armv7l_raspbian
+          arch: armv7l
+          kaldi_arch: armv6l
+          cpu: cortex-a7
+          python_version_wheel: cp37-cp37m
+          python_version_egg: py3.7
+          base_image: raspbian_lite:latest
+          raspbian_name: raspbian10
+          cpu_info: cpuinfo/raspberrypi_3b
         - target: armv7l_raspios
           arch: armv7l
+          kaldi_arch: armv7l
           cpu: cortex-a7
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
@@ -124,6 +159,7 @@ jobs:
           cpu_info: cpuinfo/raspberrypi_3b
         - target: aarch64_raspios
           arch: aarch64
+          kaldi_arch: aarch64
           cpu: cortex-a53
           python_version_wheel: cp39-cp39
           python_version_egg: py3.9
@@ -141,7 +177,7 @@ jobs:
     - name: Download and extract kaldi
       shell: bash
       env:
-        MACHINE: ${{ matrix.arch }}
+        MACHINE: ${{ matrix.kaldi_arch }}
         RASPBIAN_NAME: ${{ matrix.raspbian_name }}
       run: |
         KALDI_RELEASE=e4940d045
@@ -174,6 +210,8 @@ jobs:
         copy_repository_path:
             /home/pi/py-kaldi-asr
         commands: |
+            # Disable IPv6 in case it is configured but does not work
+            ping6 -c 1 www.ietf.org || sudo sysctl -w net.ipv6.conf.eth0.disable_ipv6=1
             apt-get update -y --allow-releaseinfo-change
             apt-get install --no-install-recommends -y python3 python3-setuptools python3-pip python3-dev python3-numpy cython3 python3-wheel libatlas-base-dev
             cp -a kaldi/opt /
