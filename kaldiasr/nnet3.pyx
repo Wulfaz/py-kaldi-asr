@@ -1,5 +1,4 @@
 # distutils: language = c++
-# distutils: sources = nnet3.cpp
 
 #
 # Copyright 2016, 2017, 2018 G. Bartsch

@@ -1,5 +1,4 @@
 # distutils: language = c++
-# distutils: sources = gmm.cpp
 
 #
 # Author: David Zurow, adapted from G. Bartsch
