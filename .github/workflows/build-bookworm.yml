@@ -44,7 +44,7 @@ jobs:
           wget -q -O - "${MODEL_URL}" | tar xJ -C model
 
       - name: Build and smoke-test in emulated Raspberry Pi
-        uses: pguyot/arm-runner-action@v2.6.5
+        uses: pguyot/arm-runner-action@45f370abd7eed1b20397277e5ec0cb0a31adb026 # main 2026-09-26: Ubuntu 26.04 qemu fix, not in v2.6.5
         with:
           base_image: ${{ matrix.base_image }}
           cpu: ${{ matrix.cpu }}
