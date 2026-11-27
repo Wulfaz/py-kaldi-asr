@@ -1,7 +1,7 @@
-name: Build py-kaldi-asr wheels for Bookworm (armv6l, armv7l, aarch64)
+name: Build py-kaldi-asr wheels for Bookworm and Trixie (armv6l, armv7l, aarch64)
 on:
   push:
-    branches: [master, modernize-py311]
+    branches: [master, modernize-py311, trixie]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
@@ -31,6 +31,23 @@ jobs:
             kaldi_platform: raspbian12-armv7l
           - target: aarch64-bookworm
             base_image: dietpi:rpi_armv8_bookworm
+            cpu: cortex-a53
+            cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+            kaldi_platform: debian12-aarch64
+          # Trixie (Python 3.13): no Kaldi build for Debian 13 yet, the
+          # Bookworm one is ABI compatible (checked by the smoke test).
+          - target: armv6l-trixie
+            base_image: dietpi:rpi_armv6_trixie
+            cpu: arm1176
+            cpu_info: cpuinfo/raspberrypi_zero_w
+            kaldi_platform: raspbian12-armv6l
+          - target: armv7l-trixie
+            base_image: dietpi:rpi_armv7_trixie
+            cpu: cortex-a7
+            cpu_info: cpuinfo/raspberrypi_3b
+            kaldi_platform: raspbian12-armv7l
+          - target: aarch64-trixie
+            base_image: dietpi:rpi_armv8_trixie
             cpu: cortex-a53
             cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
             kaldi_platform: debian12-aarch64
