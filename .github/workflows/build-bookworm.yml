@@ -79,6 +79,10 @@ jobs:
             cp -a kaldi/usr/lib/pkgconfig/kaldi-asr.pc /usr/lib/pkgconfig/kaldi-asr.pc
             cp -a kaldi/etc/ld.so.conf.d/kaldi.conf /etc/ld.so.conf.d/kaldi.conf
             ldconfig
+            # OpenFst 1.7 assigns a raw pointer to a unique_ptr in FstImpl's
+            # operator=, which GCC 14 (Trixie) rejects: use reset().
+            sed -i -E 's/\b([io]symbols_) = impl\.\1 \? impl\.\1->Copy\(\) : nullptr;/\1.reset(impl.\1 ? impl.\1->Copy() : nullptr);/' \
+              /opt/kaldi/tools/openfst/include/fst/fst.h
 
             # Build in an isolated env (Cython 3 + setuptools from PyPI/piwheels)
             python3 -m venv /tmp/build
